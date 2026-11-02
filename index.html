@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Баянгол үнийн шалгалт</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow column read top to bottom. Questions in numbered steps, then one big answer. Large type, thick borders, state shown by words and symbols, never by colour alone. */
+:root {
+  --bg: #f3f3ee; --surface: #ffffff; --ink: #0d1110; --ink-2: #33403d; --line: #4a5754;
+  --accent: #0b3d91; --accent-ink: #ffffff; --accent-soft: #dce8ff;
+  --good: #0b5a35; --good-bg: #d9f1e3; --warn: #6e3f00; --warn-bg: #ffecc2; --bad: #8a1a12; --bad-bg: #fbdcd8;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --base: 20px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0e0d; --surface: #171c1b; --ink: #ffffff; --ink-2: #dbe3e1; --line: #a9b8b4;
+    --accent: #b5cdff; --accent-ink: #061330; --accent-soft: #1d2c4f;
+    --good: #8ee6b4; --good-bg: #123a27; --warn: #ffd27a; --warn-bg: #3f2c06; --bad: #ffb0a8; --bad-bg: #4a1e19; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0e0d; --surface: #171c1b; --ink: #ffffff; --ink-2: #dbe3e1; --line: #a9b8b4;
+  --accent: #b5cdff; --accent-ink: #061330; --accent-soft: #1d2c4f;
+  --good: #8ee6b4; --good-bg: #123a27; --warn: #ffd27a; --warn-bg: #3f2c06; --bad: #ffb0a8; --bad-bg: #4a1e19; color-scheme: dark;
+}
+:root[data-size="tiny"] { --base: 13px; }
+:root[data-size="small"] { --base: 16px; }
+:root[data-size="large"] { --base: 24px; }
+:root[data-size="huge"] { --base: 28px; }
+html { font-size: var(--base); }
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 1rem; line-height: 1.55; margin: 0;
+  padding-block: 20px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; text-wrap: balance; }
+h2 { font-size: 1.2rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+b { font-weight: 700; }
+.small { font-size: .85rem; color: var(--ink-2); }
+.card { background: var(--surface); border: 3px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 22px; }
+.step { display: flex; flex-direction: column; gap: 10px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.step > legend, .step > .q { font-size: 1.1rem; font-weight: 700; padding: 0; display: flex; gap: 10px; align-items: baseline; }
+.n { flex: none; width: 1.7em; height: 1.7em; border-radius: 50%; background: var(--ink); color: var(--bg); display: inline-flex; align-items: center; justify-content: center; font-size: .9rem; font-weight: 700; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { display: flex; align-items: center; gap: 12px; }
+.field .unit { font-size: 1rem; font-weight: 600; flex: none; }
+input[type=number], select, input.text { font: 600 1.2rem var(--sans); color: var(--ink); background: var(--surface); border: 3px solid var(--line); border-radius: 10px; padding: 12px 14px; min-height: 3.2rem; width: 100%; min-width: 0; }
+select { font-weight: 500; font-size: 1.05rem; }
+:focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
+button { font-family: var(--sans); }
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.choice, .big { font-size: 1rem; color: var(--ink); background: var(--surface); border: 3px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 3.4rem; text-align: left; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; width: 100%; }
+.choice .tick { flex: none; width: 1.4em; height: 1.4em; border: 3px solid var(--line); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; margin-top: .1em; }
+.choice b { display: block; }
+.choice small { display: block; font-size: .85rem; color: var(--ink-2); }
+.choice[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.choice[aria-pressed="true"] .tick { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.big { justify-content: center; align-items: center; text-align: center; font-weight: 700; font-size: 1.1rem; }
+.big[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.btn { font-size: 1rem; font-weight: 700; color: var(--accent-ink); background: var(--accent); border: 3px solid var(--accent); border-radius: 12px; padding: 12px 18px; min-height: 3.2rem; cursor: pointer; }
+.btn.alt { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn[disabled] { opacity: .5; cursor: default; }
+.sizes { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.sizes .btn { padding: 8px 16px; min-height: 2.8rem; }
+.sizes .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.sizes .btn[aria-pressed="false"] { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.notice { background: var(--accent-soft); border: 3px solid var(--accent); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.result { border-top: 3px solid var(--line); padding-top: 22px; display: flex; flex-direction: column; gap: 20px; }
+.banner { border: 3px solid currentColor; border-radius: 14px; padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+.banner .ic { flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: currentColor; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; }
+.banner .ic span { color: var(--surface); }
+.banner h3 { margin: 0; font-size: 1.35rem; line-height: 1.25; }
+.banner p { color: var(--ink); margin-top: 4px; }
+.banner.good { color: var(--good); background: var(--good-bg); } .banner.warn { color: var(--warn); background: var(--warn-bg); } .banner.bad { color: var(--bad); background: var(--bad-bg); } .banner.info { color: var(--accent); background: var(--accent-soft); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.box { border: 3px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+.box .lab { font-size: .85rem; color: var(--ink-2); display: block; }
+.box .val { font-size: 1.3rem; font-weight: 700; display: block; overflow-wrap: anywhere; }
+.sec { display: flex; flex-direction: column; gap: 8px; }
+.list { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; margin: 0; }
+.list dt { color: var(--ink-2); } .list dd { margin: 0; text-align: right; font-weight: 700; }
+.list .tot, .list .tot + dd { border-top: 3px solid var(--line); padding-top: 8px; font-size: 1.15rem; color: var(--ink); }
+.total { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
+.warnbox { background: var(--warn-bg); color: var(--warn); border: 3px solid var(--warn); border-radius: 12px; padding: 12px 14px; font-size: .9rem; }
+details { border: 3px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--surface); }
+details summary { cursor: pointer; font-weight: 700; font-size: 1rem; min-height: 2.4rem; display: flex; align-items: center; }
+details .in { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; }
+.cmp { display: flex; flex-direction: column; gap: 10px; }
+.cmp .it { border: 3px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.cmp .it.best { border-color: var(--accent); background: var(--accent-soft); }
+.remove { background: none; border: 0; color: var(--accent); font-size: .9rem; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; padding: 8px; min-height: 2.6rem; cursor: pointer; }
+.cardtop { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tabs .big[aria-pressed="false"] { background: var(--surface); }
+.lc { border: 3px solid var(--line); border-radius: 14px; background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.lc.like { border-color: var(--good); background: var(--good-bg); }
+.lc.dim { background: var(--bg); border-style: dashed; color: var(--ink-2); }
+.lc.dim h3 { text-decoration: line-through; }
+.phs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.ph { flex: none; width: 5.2rem; height: 3.9rem; object-fit: cover; border-radius: 8px; background: var(--bg); border: 2px solid var(--line); display: block; cursor: zoom-in; }
+.zoom { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.85); display: flex; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
+.zoom img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+.pwrap { position: relative; }
+.pwrap input { padding-right: 3.4rem !important; }
+.eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 2.6rem; height: 2.6rem; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; border-radius: 8px; color: var(--ink); cursor: pointer; }
+.eye:hover, .eye:focus-visible { background: var(--accent-soft); }
+.eye svg { width: 1.5rem; height: 1.5rem; }
+.lc h3 { margin: 0; font-size: 1.05rem; line-height: 1.35; overflow-wrap: anywhere; }
+.tag { display: inline-block; font-weight: 700; border: 2px solid currentColor; border-radius: 8px; padding: 2px 10px; font-size: .85rem; }
+.tag.good { color: var(--good); } .tag.warn { color: var(--warn); } .tag.bad { color: var(--bad); } .tag.info { color: var(--accent); }
+.acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.acts .btn { padding: 8px 6px; font-size: .9rem; min-height: 3rem; }
+.acts .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.lc textarea { font: 500 1rem var(--sans); color: var(--ink); background: var(--surface); border: 3px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; min-height: 4.2rem; }
+.lc a { color: var(--accent); font-weight: 700; }
+.lc label.sm { font-size: .85rem; color: var(--ink-2); font-weight: 600; }
+.ctl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .acts, .ctl { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .pair, .row2 { grid-template-columns: 1fr; } h1 { font-size: 1.45rem; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.gate { max-width: 460px; margin: 8vh auto 0; display: flex; flex-direction: column; gap: 18px; }
+.gate .card { gap: 16px; }
+.gate input[type=password], .gate input[type=text] { font: inherit; font-size: 1.1rem; padding: 12px 14px; border: 3px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); width: 100%; }
+.gate .err { color: var(--bad); font-weight: 700; min-height: 1.5em; }
+.profiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+.prof { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px; border: 3px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+.prof:hover, .prof:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+.prof .av { width: 3.2rem; height: 3.2rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #fff; background: var(--accent-bg, #0b3d91); }
+.prof .nm { max-width: 100%; overflow-wrap: anywhere; }
+.pbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.pbar .who { font-weight: 700; }
+.linkbtn { font: inherit; background: none; border: 0; padding: 6px 2px; color: var(--accent); font-weight: 700; text-decoration: underline; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <h1>Баянгол үнийн шалгалт</h1>
+  <div class="card" id="g-pw">
+    <label for="pw" class="q">Нууц үгээ оруулна уу</label>
+    <div class="pwrap"><input type="password" id="pw" autocomplete="current-password" autofocus>
+      <button type="button" class="eye" id="pw-eye" aria-label="Нууц үгийг харуулах" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><path id="eye-slash" d="M3 3l18 18" hidden/></svg></button></div>
+    <p class="err" id="pw-err" role="alert"></p>
+    <button type="button" class="btn" id="pw-go">Нэвтрэх</button>
+  </div>
+  <div class="card" id="g-prof" hidden>
+    <h2>Хэн орж байна вэ?</h2>
+    <div class="profiles" id="plist"></div>
+    <div id="pnew-wrap" style="display:flex;flex-direction:column;gap:10px">
+      <label for="pnew" class="small" style="font-weight:600">Шинэ хоч нэмэх</label>
+      <input type="text" id="pnew" maxlength="20" autocomplete="off" placeholder="Жишээ нь: Бат">
+      <p class="err" id="pnew-err" role="alert"></p>
+      <button type="button" class="btn" id="pnew-go">Нэмэх</button>
+    </div>
+    <p class="small">Хоч, таны жагсаалт зөвхөн энэ төхөөрөмж дээрх хөтөч дотор хадгалагдана.</p>
+    <button type="button" class="linkbtn" id="g-lock" style="align-self:flex-start">Түгжих</button>
+  </div>
+</div>
+
+<main hidden>
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <h1>Байрны үнийг ижил төстэй зартай харьцуулах</h1>
+    <p>Байрныхаа мэдээллийг бөглөөд доор гарах хариуг харна уу.</p>
+    <div class="pbar"><span class="who" id="who"></span><button type="button" class="linkbtn" id="p-switch">Хоч солих</button><button type="button" class="linkbtn" id="p-lock">Түгжих</button></div>
+    <div class="sizes" role="group" aria-label="Үсгийн хэмжээ">
+      <span class="small" style="font-weight:600">Үсгийн хэмжээ:</span>
+      <button type="button" class="btn" data-size="tiny" aria-pressed="false">Хамгийн жижиг</button>
+      <button type="button" class="btn" data-size="small" aria-pressed="false">Жижиг</button>
+      <button type="button" class="btn" data-size="normal" aria-pressed="true">Жирийн</button>
+      <button type="button" class="btn" data-size="large" aria-pressed="false">Том</button>
+      <button type="button" class="btn" data-size="huge" aria-pressed="false">Маш том</button>
+    </div>
+    <div class="tabs" role="group" aria-label="Хуудас">
+      <button type="button" class="big" data-tab="list" aria-pressed="true" id="tablist">Бүх зар</button>
+      <button type="button" class="big" data-tab="check" aria-pressed="false">Нэг байр шалгах</button>
+    </div>
+  </header>
+
+  <div id="tab-check" style="display:flex;flex-direction:column;gap:24px" hidden>
+  <div class="notice" id="example" hidden>
+    <p><b>Энэ бол жишээ.</b> Доорх тоонууд жинхэнэ байр биш. Өөрийн байрныхаа тоог бичихэд хариу өөрчлөгдөнө.</p>
+    <button type="button" class="btn" id="clear">Жишээг арилгаад өөрийнхөө тоог бичих</button>
+  </div>
+
+  <section id="cards" style="display:flex;flex-direction:column;gap:24px"></section>
+
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <button type="button" class="btn alt" id="add">Өөр байртай харьцуулах</button>
+  </div>
+
+  <section class="card" id="compare" hidden>
+    <h2>Байруудын харьцуулалт</h2>
+    <div class="cmp" id="cmp"></div>
+    <p class="small">Хамгийн бага үнэтэй байр гэдэг нь заавал хамгийн сайн гэсэн үг биш. Байрны хэмжээ, байршил өөр өөр байна.</p>
+  </section>
+
+  <section class="card">
+    <label class="step" for="budget">
+      <span class="q">Таны нийт төсөв хэд вэ? (заавал биш)</span>
+      <span class="field"><input type="number" id="budget" min="0" step="5" inputmode="decimal"><span class="unit">сая ₮</span></span>
+      <span class="small">Бичвэл, төсөвтөө багтаж авах дээд үнийг хариунд харуулна.</span>
+    </label>
+  </section>
+
+  <details>
+    <summary>Нарийвчилсан тохиргоо (шаардлагагүй бол орхино уу)</summary>
+    <div class="in">
+      <p class="small">Эдгээр тоо нь хэмжсэн өгөгдөл биш, зөвхөн таамаглал. Засварчин, мэргэжилтнээс авсан үнийн саналаар солиорой.</p>
+      <div id="assump" style="display:flex;flex-direction:column;gap:18px"></div>
+      <button type="button" class="btn alt" id="reset">Анхны утга руу буцаах</button>
+    </div>
+  </details>
+
+  <details>
+    <summary>Эдгээр тоо хаанаас гарсан бэ?</summary>
+    <div class="in">
+      <p id="about"></p>
+      <p><b>Энэ бол зөвхөн чиглүүлэг.</b> Байрыг биечлэн үзэж, мэргэжилтэнтэй зөвлөлдөөрэй. Санхүүгийн зөвлөгөө биш.</p>
+    </div>
+  </details>
+  </div>
+
+  <div id="tab-list" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2>Баянгол дүүргийн зарууд</h2>
+      <p class="small" id="lintro"></p>
+      <p class="small" id="lcount" aria-live="polite"></p>
+    </div>
+    <details>
+      <summary>Шүүх, эрэмбэлэх, тохиргоо</summary>
+      <div class="ctl in">
+        <label class="step" for="lcond"><span class="q" style="font-size:.95rem">Байрны байдал (бүх зарт)</span><select id="lcond"></select></label>
+        <label class="step" for="lfin"><span class="q" style="font-size:.95rem">Засварын чанар</span><select id="lfin"></select></label>
+        <label class="step" for="lfilter"><span class="q" style="font-size:.95rem">Харуулах</span><select id="lfilter"></select></label>
+        <label class="step" for="lfloor"><span class="q" style="font-size:.95rem">Давхар</span><select id="lfloor"></select></label>
+        <label class="step" for="lsort"><span class="q" style="font-size:.95rem">Эрэмбэлэх</span><select id="lsort"></select></label>
+      </div>
+    </details>
+    <details>
+      <summary>Хороолол тус бүрээр, газрын зураг дээр харах</summary>
+      <div class="in" id="lareas"></div>
+    </details>
+    <section id="lcards" style="display:flex;flex-direction:column;gap:16px"></section>
+    <p class="small">Таны сонголт, тэмдэглэл зөвхөн энэ төхөөрөмж дээрх хөтөч дотор хадгалагдана. Өөр утас, компьютер дээр харагдахгүй.</p>
+  </div>
+</main>
+
+<script>/* Deal estimator core. Pure functions: the same inputs always give the same outputs.
+   No randomness, no dates, no network. Money is in MNT, area in m2. */
+var Core = (function () {
+  var DEFAULTS = {
+    // Price factor applied to the comparables' price per m2, by the flat's condition.
+    // ASSUMPTION: unegui listings carry no condition field, so these are not measured from data.
+    factor: { new: 1.05, fixed: 1.03, old: 1.00, shell: 0.92 },
+    // Renovation cost to reach "ready to move in", MNT per m2, at Standard finish.
+    // PLACEHOLDERS, not sourced: replace with contractor quotes.
+    reno: { new: 0, fixed: 50000, old: 300000, shell: 900000 },
+    finish: { basic: 0.8, standard: 1.0, premium: 1.4 },
+    // Price factor by floor, applied on top of the condition factor. ASSUMPTION, not measured: first and top floors usually sell cheaper.
+    floor: { first: 0.95, top: 0.97, mid: 1 },
+    // Old-building flats ("huuchin" in the ad): add this many m2 to the listed area before dividing price by area. ASSUMPTION from the user, editable.
+    oldExtra: 8,
+    contingencyPct: 10,   // added on top of renovation cost
+    feesPct: 2,           // agent, notary, registration: % of purchase price (placeholder)
+    furnishing: 0         // fixed allowance for appliances and furniture, MNT
+  };
+  var MIN_PEERS = 5;
+
+  function quantile(sorted, p) {            // linear interpolation between closest ranks ("type 7")
+    if (!sorted.length) return NaN;
+    var h = (sorted.length - 1) * p, lo = Math.floor(h), hi = Math.ceil(h);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (h - lo);
+  }
+  function trim(vals) {                      // drop values beyond 1.5 x IQR once there are 8 or more
+    var s = vals.slice().sort(function (a, b) { return a - b; });
+    if (s.length < 8) return s;
+    var q1 = quantile(s, 0.25), q3 = quantile(s, 0.75), iqr = q3 - q1;
+    return s.filter(function (v) { return v >= q1 - 1.5 * iqr && v <= q3 + 1.5 * iqr; });
+  }
+  function stats(vals) {
+    var s = trim(vals);
+    return { n: s.length, p25: quantile(s, 0.25), median: quantile(s, 0.5), p75: quantile(s, 0.75), min: s[0], max: s[s.length - 1] };
+  }
+
+  // Choose comparables: same room count, area within +-15%, then +-25%, then every flat with that room count.
+  // A sub-area is used only if it still leaves MIN_PEERS or more; otherwise the whole district is used.
+  function comparables(data, q, extra) {
+    extra = extra || 0;
+    function ea(x) { return x.a + (x.h ? extra : 0); }
+    var qa = q.area + (q.old ? extra : 0);
+    var base = data.filter(function (x) { return x.r === q.rooms; }).sort(function (x, y) {
+      return (x.a - y.a) || (x.p - y.p) || (x.s < y.s ? -1 : x.s > y.s ? 1 : 0);   // fixed order, whatever the input order
+    });
+    var steps = [0.15, 0.25], i, note = '';
+    function within(list, w) { return list.filter(function (x) { return Math.abs(ea(x) - qa) <= w * qa; }); }
+    var pools = [];
+    if (q.sub) pools.push({ list: base.filter(function (x) { return x.s === q.sub; }), label: q.sub });
+    pools.push({ list: base, label: 'all Bayangol' });
+    for (var p = 0; p < pools.length; p++) {
+      for (i = 0; i < steps.length; i++) {
+        var peers = within(pools[p].list, steps[i]);
+        if (peers.length >= MIN_PEERS) {
+          var subFallback = !!(q.sub && p === 1);
+          if (subFallback) note = 'Fewer than ' + MIN_PEERS + ' similar flats in ' + q.sub + ', so all of Bayangol was used.';
+          return { peers: peers, window: steps[i], scope: pools[p].label, sizeMatched: true, note: note, noteCode: subFallback ? 'sub_fallback' : '', noteSub: q.sub || '' };
+        }
+      }
+    }
+    return { peers: base, window: null, scope: 'all Bayangol', sizeMatched: false, noteCode: 'room_fallback', noteSub: '',
+      note: 'Fewer than ' + MIN_PEERS + ' flats of similar size, so every ' + q.rooms + '-room flat was used and size was not adjusted.' };
+  }
+
+  function confidence(c, n) {
+    if (!c.sizeMatched || n < MIN_PEERS) return { code: 'very_low', n: n, level: 'Very low', text: 'Too few similar flats; treat as a rough guide only.' };
+    if (n >= 15) return { code: 'moderate', n: n, level: 'Moderate', text: n + ' similar flats. Asking prices only, condition unknown.' };
+    if (n >= 8) return { code: 'low_moderate', n: n, level: 'Low to moderate', text: n + ' similar flats. Asking prices only, condition unknown.' };
+    return { code: 'low', n: n, level: 'Low', text: 'Only ' + n + ' similar flats.' };
+  }
+
+  function renoCost(area, cond, finish, a) {
+    return Math.round(area * a.reno[cond] * a.finish[finish] * (1 + a.contingencyPct / 100));
+  }
+
+  function fairRange(data, o, a) {
+    var ex = a.oldExtra || 0, qa = o.area + (o.old ? ex : 0);
+    var c = comparables(data, o, ex);
+    var st = stats(c.peers.map(function (x) { return x.p / (x.a + (x.h ? ex : 0)); }));
+    var f = a.factor[o.cond] * ((o.floor && a.floor && a.floor[o.floor]) || 1);
+    return {
+      comps: c, stats: st, factor: f, qa: qa,
+      low: Math.round(st.p25 * f * qa), mid: Math.round(st.median * f * qa), high: Math.round(st.p75 * f * qa),
+      conf: confidence(c, st.n)
+    };
+  }
+
+  function verdict(price, fr) {
+    var r = {};
+    r.gapMidPct = (price / fr.mid - 1) * 100;
+    if (price < 0.85 * fr.low) { r.code = 'far_below'; r.label = 'Far below the fair range'; r.advice = 'Find out why before anything else: condition, floor, ownership papers, loans on the flat.'; }
+    else if (price < fr.low) { r.code = 'below'; r.label = 'Below the fair range'; r.advice = 'Priced under similar flats. Verify the reason, then it is a good sign.'; }
+    else if (price <= fr.high) {
+      var third = (price - fr.low) / Math.max(1, fr.high - fr.low);
+      r.code = 'fair'; r.pos = third < 1 / 3 ? 'lower' : third < 2 / 3 ? 'middle' : 'upper';
+      r.label = third < 1 / 3 ? 'Fair, lower part of the range' : third < 2 / 3 ? 'Fair, middle of the range' : 'Fair, upper part of the range';
+      r.advice = third < 2 / 3 ? 'In line with similar flats.' : 'In line, but there is room to negotiate down.';
+    }
+    else if (price <= 1.10 * fr.high) { r.code = 'above'; r.label = 'Above the fair range'; r.advice = 'Negotiate. Similar flats ask less.'; }
+    else { r.code = 'far_above'; r.label = 'Well above the fair range'; r.advice = 'Priced well over similar flats. Look at other options.'; }
+    return r;
+  }
+
+  function offer(price, fr) {
+    var low = Math.min(fr.low, price), high = Math.min(fr.mid, price), walk = Math.min(fr.high, price);
+    return { low: low, high: high, walkAway: walk };
+  }
+
+  function totalCost(price, o, a) {
+    var fees = Math.round(price * a.feesPct / 100);
+    var reno = renoCost(o.area, o.cond, o.finish, a);
+    var total = price + fees + reno + a.furnishing;
+    return { price: price, fees: fees, reno: reno, furnishing: a.furnishing, total: total, perM2: Math.round(total / o.area) };
+  }
+
+  // Ready-to-move-in alternative: the fair range of a newly fixed flat of the same size, plus the same fees.
+  function readyAlternative(data, o, a) {
+    var fr = fairRange(data, { rooms: o.rooms, area: o.area, sub: o.sub, cond: 'fixed', floor: o.floor, old: o.old }, a);
+    var fee = function (p) { return Math.round(p * (1 + a.feesPct / 100)) + a.furnishing; };
+    return { low: fee(fr.low), mid: fee(fr.mid), high: fee(fr.high) };
+  }
+
+  // Largest purchase price that keeps the all-in cost within a budget.
+  function maxPrice(budget, o, a) {
+    var left = budget - renoCost(o.area, o.cond, o.finish, a) - a.furnishing;
+    return Math.max(0, Math.floor(left / (1 + a.feesPct / 100)));
+  }
+
+  function evaluate(data, o, a) {
+    var fr = fairRange(data, o, a);
+    var out = { fair: fr, ready: readyAlternative(data, o, a) };
+    if (o.price > 0) {
+      out.verdict = verdict(o.price, fr);
+      out.offer = offer(o.price, fr);
+      out.cost = totalCost(o.price, o, a);
+      out.costAtFairMid = totalCost(fr.mid, o, a);
+    } else {
+      out.cost = totalCost(fr.mid, o, a);   // no asking price: cost at the middle of the fair range
+      out.costBasis = 'fair-mid';
+    }
+    return out;
+  }
+
+  return { DEFAULTS: DEFAULTS, MIN_PEERS: MIN_PEERS, quantile: quantile, stats: stats, comparables: comparables,
+    fairRange: fairRange, verdict: verdict, offer: offer, totalCost: totalCost, renoCost: renoCost,
+    readyAlternative: readyAlternative, maxPrice: maxPrice, evaluate: evaluate };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+</script>
+<script>
+function boot() {
+var DATA = window.__MASTER;
+var LIST = DATA.listings;
+var KEY = window.__KEY;
+var CONDS = ['new', 'fixed', 'old', 'shell'];
+var FINISH = ['basic', 'standard', 'premium'];
+
+/* Mongolian wording. Should be reviewed by a native speaker. */
+var W = {
+  option: 'Байр', remove: 'Энэ байрыг хасах',
+  q1: 'Хэдэн өрөө байр вэ?', room1: '1 өрөө', room2: '2 өрөө',
+  q2: 'Талбай нь хэд м² вэ?', unitM2: 'м²', q3b: 'Нэг м² нь хэдэн сая төгрөг вэ?', unitPm2: 'сая ₮ / м²', priceHintB: 'Жишээ нь: 4.2 гэж бичвэл нэг м² 4.2 сая төгрөг. Нийт үнийг талбайгаар үржүүлж бодно.',
+  q3: 'Хэдэн сая төгрөгөөр зарж байна вэ?', unitPrice: 'сая ₮',
+  priceHint: 'Жишээ нь: 149 гэж бичвэл 149 сая төгрөг. Үнийг мэдэхгүй бол хоосон орхиж болно, тэгвэл ижил төстэй зарын үнийг тооцоолно.',
+  q4: 'Байр хаана байдаг вэ? (заавал биш)', subAny: 'Баянгол дүүргийн аль ч хэсэг',
+  q5: 'Байрны байдал ямар вэ?',
+  cond: {
+    new: ['Шинэ, дууссан', 'Хэн ч амьдраагүй, засвар хэрэггүй.'],
+    fixed: ['Саяхан засвар хийсэн', 'Шинэчлэн засварласан, шууд орж амьдарч болно.'],
+    old: ['Хуучин, амьдарч болно', 'Бага зэргийн засвар (будаг, шал) хийхэд хангалттай.'],
+    shell: ['Хуучин, том засвар хэрэгтэй', 'Бүх зүйлийг засах шаардлагатай.']
+  },
+  q6: 'Засварын дараа ямар түвшинд байлгах вэ?',
+  finish: { basic: ['Энгийн', 'Хамгийн хямд, энгийн засвар.'], standard: ['Дунд', 'Ердийн чанартай засвар.'], premium: ['Сайн чанартай', 'Өндөр чанартай, үнэтэй засвар.'] },
+  needArea: 'Дээр байрны талбайг бичнэ үү (15-аас 120 м² хооронд). Тэгвэл хариу энд гарна.',
+  verdict: {
+    far_below: ['Үнэ ижил төстэй зарнаас маш бага', '!', 'warn', 'Ийм бага үнэтэй байх шалтгааныг заавал асуугаарай: байрны байдал, давхар, орчин, өмчлөлийн бичиг, зээлийн барьцаа.'],
+    below: ['Үнэ ижил төстэй зарнаас бага', 'i', 'info', 'Энэ нь сайн сонголт гэсэн үг биш. Бага үнэтэй байх шалтгааныг (орчин, байрны байдал, бичиг баримт) өөрөө шалгаарай.'],
+    fair_lower: ['Үнэ ижил төстэй зарын хүрээнд, доод талдаа', 'i', 'info', 'Үнийн хувьд ижил төстэй зартай ойролцоо байна. Бусад нөхцөлийг өөрөө шалгана уу.'],
+    fair_middle: ['Үнэ ижил төстэй зарын хүрээнд', 'i', 'info', 'Үнийн хувьд ижил төстэй зартай ойролцоо байна. Бусад нөхцөлийг өөрөө шалгана уу.'],
+    fair_upper: ['Үнэ ижил төстэй зарын хүрээнд, дээд талдаа', 'i', 'info', 'Үнийг буулгах боломжтой байж магадгүй, хэлэлцээр хийгээрэй.'],
+    above: ['Үнэ ижил төстэй зарнаас өндөр', '!', 'warn', 'Үнийг буулгахыг хүсэж болно. Ижил төстэй зарууд бага үнэтэй байна.'],
+    far_above: ['Үнэ ижил төстэй зарнаас маш өндөр', '✖', 'bad', 'Ижил төстэй зарнаас хамаагүй үнэтэй. Өөр байр харахыг зөвлөе.']
+  },
+  estTitle: 'Ижил төстэй зарын үнэ', estText: 'Зарласан үнэ оруулаагүй тул тооцоолсон дүнг харуулав.',
+  fairLab: 'Ижил төстэй зарын үнийн хүрээ', yourLab: 'Таны байрны үнэ', fairMidLab: 'Ижил төстэй зарын дундаж үнэ',
+  offerH: 'Хэрхэн үнэ хэлэлцэх вэ?', openAt: 'Санал тавих үнэ', settle: 'Тохиролцож болох үнэ', walk: 'Үүнээс өндөр бол татгалзана',
+  payUpTo: 'Зарласан үнээр авч болно', offerNoteLow: 'Зарласан үнэ ижил төстэй зарын үнийн хүрээнээс доогуур байна. Үнийг буулгах шаардлагагүй, гэхдээ яагаад хямд байгааг шалгаарай.',
+  offerNote: 'Эхлээд доод үнийг санал болго, дундаж үнэд тохиролц, дээд үнээс өндөр бол авахгүй.',
+  costH: 'Орж амьдрахад нийт хэдэн төгрөг гарах вэ?', buy: 'Байрны үнэ',
+  fees: function (p) { return 'Шимтгэл, татвар (' + p + '%)'; }, reno: function (p) { return 'Засвар (' + p + '% нөөцтэй)'; },
+  furn: 'Тавилга, цахилгаан хэрэгсэл', total: 'Нийт', perM2: 'Нэг м² тутамд',
+  ready: function (lo, hi, diff, more, tail) {
+    var tails = { plain: '.', close: ', өөрөөр хэлбэл бэлэн байр авахтай ойролцоо.', worse: ', тиймээс засвар хийж авах нь бэлэн байр авахаас ашиггүй.', better: ', тиймээс энэ байрыг засварлах нь бэлэн байр авахаас хямд.' };
+    return 'Шинэчлэн засвартай, ижил хэмжээтэй байр шимтгэлтэйгээ ойролцоогоор <b>' + lo + ' - ' + hi + '</b> болно. Таны нийт зардал үүний дунджаас <b>' + diff + (more ? ' илүү' : ' бага') + '</b> байна' + tails[tail];
+  },
+  budgetLine: function (b, mp, fit) { return 'Таны ' + b + ' сая ₮ төсөвт энэ байранд хамгийн ихдээ <b>' + mp + '</b> төлж болно' + fit; },
+  fits: '; зарласан үнэ багтаж байна.', over: function (x) { return '; зарласан үнэ ' + x + ' хэтэрч байна.'; },
+  confLabel: 'Энэ хариуг хэр найдах вэ?', conf: { very_low: 'Маш бага', low: 'Бага', low_moderate: 'Дунд зэрэг', moderate: 'Дунд зэрэг' },
+  confText: function (code, n) { return code === 'very_low' ? 'Ижил төстэй байр хэт цөөн байна. Зөвхөн ойролцоо чиглэл болгон ашиглаарай.' : code === 'low' ? 'Ердөө ' + n + ' ижил төстэй байртай харьцууллаа.' : n + ' ижил төстэй байртай харьцууллаа. Эдгээр нь зарласан үнэ бөгөөд байрны байдал тодорхойгүй.'; },
+  noteSub: function (s) { return s + ' дахь ижил төстэй байр цөөн тул Баянгол дүүргийн бүх мэдээллийг ашиглалаа.'; },
+  noteRoom: function (r) { return 'Ижил хэмжээтэй байр цөөн тул бүх ' + r + ' өрөө байрыг авсан бөгөөд хэмжээний зөрүүг тооцоогүй.'; },
+  howH: 'Хэрхэн тооцсон бэ?',
+  how1: function (n, r, w, a) { return 'Талбай нь ' + a + ' м²-ээс ±' + w + '%-ийн дотор байгаа ' + n + ' ширхэг ' + r + ' өрөө байртай харьцуулав. Хэт өндөр, хэт нам үнэтэй цөөн байрыг хасав.'; },
+  how1b: function (n, r) { return 'Бүх ' + n + ' ширхэг ' + r + ' өрөө байртай харьцуулав. Хэмжээний зөрүүг тооцоогүй.'; },
+  how2: function (a, b, c) { return 'Тэдгээрийн нэг м²-ийн үнэ: ихэнх нь ' + a + ' - ' + c + ' хооронд, дундаж нь ' + b + '.'; },
+  how3: function (f) { return 'Үнийн хүрээ = талбай × нэг м²-ийн үнэ × байрны байдлын коэффициент ' + f + ' (таамаглал).'; },
+  cmpBest: 'Нэг м² тутамд хамгийн бага үнэтэй', cmpTotal: 'Орж амьдрахад нийт', cmpNoPrice: 'Үнэ оруулаагүй, тооцоо',
+  aF: 'Байрны байдлаас үнэд гарах нөлөө, ижил төстэй байртай харьцуулсан %', aR: 'Дунд чанартай засварын өртөг, нэг м² тутамд мянган ₮',
+  aFin: 'Засварын чанарын үржвэр', aO: 'Бусад', feesPct: 'Шимтгэл, татвар, үнийн %', contPct: 'Засварын нөөц, %', furnLbl: 'Тавилга, цахилгаан хэрэгсэл, сая ₮',
+  about: function (n, n1, n2, d) { return 'Баянгол дүүргийн ' + n + ' зарын мэдээлэлд тулгуурласан (' + n1 + ' нэг өрөө, ' + n2 + ' хоёр өрөө; unegui.mn, ' + d + '). Эдгээр нь зарласан үнэ бөгөөд борлуулсан үнэ биш. Байрны байдал, давхар, барилгын насыг бүртгээгүй тул хариу нь таны байрыг бус, ердийн зарласан үнийг илтгэнэ. Хоёр өрөөний зар цөөн тул тэдгээрийн хариу найдвар багатай. Зарим байрны өрөөний тоог зарын гарчигнаас авсан.'; }
+};
+
+var ITEMS = DATA.items || [];
+function allItems() { return ITEMS.concat(state.custom || []); }
+var LW = {
+  conds: CONDS, calls: [['none', 'Залгаагүй'], ['tried', 'Залгасан, хариу өгөөгүй'], ['talked', 'Ярьсан'], ['visit', 'Үзэхээр товлосон'], ['seen', 'Үзсэн'], ['deal', 'Тохиролцсон']],
+  filters: [['all', 'Бүх зар'], ['like', 'Таалагдсан'], ['called', 'Залгасан / ярьсан'], ['dislike', 'Таалагдаагүй'], ['removed', 'Хасагдсан']],
+  floors: [['all', 'Давхар хамаагүй'], ['known', 'Давхар нь мэдэгдсэн'], ['notfirst', '1-р давхраас бусад'], ['mid', 'Дунд давхар (1-р, дээд давхраас бусад)']],
+  sorts: [['gap', 'Ижил төстэй зарын үнээс хамгийн бага нь эхэнд'], ['price', 'Үнэ: бага → их'], ['total', 'Нийт зардал: бага → их'], ['perm2', 'Нэг м² үнэ: бага → их']]
+};
+function lst(id) { return state.L[id] || (state.L[id] = { st: '', call: 'none', note: '', cond: '', ts: '' }); }
+function stamp(s) { s.ts = new Date().toLocaleDateString('mn-MN'); }
+function evalItem(x) {
+  var s = state.L[x.id] || {}, cond = s.cond || state.LC.cond;
+  var fo = floorOf(x), old = s.old === '1' ? true : s.old === '0' ? false : !!x.h, q = { old: old, fl: fo.fl, ft: fo.ft, floor: floorClass(fo.fl, fo.ft), rooms: x.r, area: x.a, sub: x.src === 'fb' ? (x.s || '') : x.l, cond: cond, finish: x.f || state.LC.finish, price: x.p };
+  var ev = Core.evaluate(LIST, q, state.A);
+  return { x: x, ev: ev, old: old, qa: ev.fair.qa, fl: fo.fl, ft: fo.ft, fc: q.floor, cond: cond, gap: x.p / ev.fair.mid - 1, total: ev.cost.total, perm2: x.p / ev.fair.qa };
+}
+function selOpts(items, cur) { return items.map(function (o) { return '<option value="' + o[0] + '"' + (String(cur) === String(o[0]) ? ' selected' : '') + '>' + o[1] + '</option>'; }).join(''); }
+function mapUrl(q) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
+function areaQuery(sub) { return (sub ? sub + ', ' : '') + 'Баянгол дүүрэг, Улаанбаатар'; }
+function photosHTML(x) {
+  var seen = {}, ph = (x.imgs || []).concat(x.i ? [x.i] : []).filter(function (u) { if (!u || seen[u]) return false; seen[u] = 1; return true; }).slice(0, 4);
+  return ph.length ? '<div class="phs">' + ph.map(function (u) { return '<img class="ph" src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" data-zoom="1">'; }).join('') + '</div>' : '';
+}
+function listCard(r) {
+  var x = r.x, s = state.L[x.id] || {}, v = r.ev.verdict, V = W.verdict[vkey(v)];
+  var cls = s.st === 'like' ? ' like' : (s.st === 'dislike' ? ' dim' : '');
+  var callName = (LW.calls.filter(function (c) { return c[0] === (s.call || 'none'); })[0] || LW.calls[0])[1];
+  return '<article class="lc' + cls + '">' + photosHTML(x) + '<h3>' + esc(x.t) + '</h3>' +
+    '<p><span class="tag ' + V[2] + '">' + V[1] + ' ' + V[0] + '</span>' + (s.st === 'like' ? ' <span class="tag good">♥ Таалагдсан</span>' : '') + (s.st === 'dislike' ? ' <span class="tag">✖ Таалагдаагүй</span>' : '') + '</p>' +
+    '<dl class="list"><dt>Байршил</dt><dd>' + esc(x.l || 'Тодорхойгүй') + '</dd><dt>Хэмжээ</dt><dd>' + x.r + ' өрөө, ' + x.a + ' м²</dd><dt>Давхар</dt><dd>' + floorText(r.fl, r.ft) + '</dd><dt>Зарласан үнэ</dt><dd>' + M(x.p) + '</dd>' +
+    '<dt>Нэг м²' + (r.old ? ' (' + r.qa + ' м²-ээр)' : '') + '</dt><dd>' + M(r.perm2, 2) + '</dd><dt>Ижил төстэй зарын үнэ</dt><dd>' + M(r.ev.fair.low) + ' - ' + M(r.ev.fair.high) + '</dd>' +
+    '<dt class="tot">Орж амьдрахад нийт</dt><dd class="tot">' + M(r.total) + '</dd></dl>' +
+    '<p class="small"><b>Зөвхөн үнийн харьцуулалт.</b> Орчин, аюулгүй байдлыг тооцоогүй.</p><p class="small">' + (x.src === 'fb' ? '<span class="tag info">Өөрөө нэмсэн</span> ' : 'Зар нийтэлсэн: ' + esc(x.w || '-') + '. ') + 'Ижил төстэй ' + r.ev.fair.conf.n + ' байртай харьцуулсан.</p>' +
+    '<p><a href="' + mapUrl(areaQuery(x.src === 'fb' ? (x.s || '') : x.l)) + '" target="_blank" rel="noopener">Газрын зураг дээр харах ↗</a></p><p class="small">Зарт яг хаяг байдаггүй тул зөвхөн хороо, хороололын орчмыг харуулна.' + (x.src === 'fb' ? '' : ' Нарийн байршлыг зарыг нээж харна уу.') + '</p>' +
+    (/^https?:\/\//i.test(x.u || '') ? '<p><a href="' + esc(x.u) + '" target="_blank" rel="noopener">Зарыг нээх ↗</a></p>' : (x.u ? '<p>Холбоос / утас: <b>' + esc(x.u) + '</b></p>' : '')) +
+    '<label class="sm" for="fl' + x.id + '">Давхар (зарыг нээж харсан давхраа бичнэ үү)</label><div class="ctl"><input class="text" type="number" id="fl' + x.id + '" data-lid="' + x.id + '" data-lf="fl" min="1" max="40" inputmode="numeric" placeholder="Хэддүгээр давхарт" value="' + (r.fl || '') + '"><input class="text" type="number" id="ft' + x.id + '" data-lid="' + x.id + '" data-lf="ft" min="1" max="40" inputmode="numeric" placeholder="Нийт давхар" value="' + (r.ft || '') + '"></div>' +
+    '<label class="sm" for="old' + x.id + '">Хуучин барилга (+' + state.A.oldExtra + ' м²)</label><select id="old' + x.id + '" data-lid="' + x.id + '" data-lf="old"><option value=""' + (!s.old ? ' selected' : '') + '>Зарын гарчигаар автоматаар (' + (x.h ? 'хуучин' : 'хуучин биш') + ')</option><option value="1"' + (s.old === '1' ? ' selected' : '') + '>Тийм</option><option value="0"' + (s.old === '0' ? ' selected' : '') + '>Үгүй</option></select>' +
+    '<label class="sm">Энэ байрны байдал</label><select data-lid="' + x.id + '" data-lf="cond">' + '<option value="">Нийтлэг сонголтыг ашиглах (' + W.cond[state.LC.cond][0] + ')</option>' + selOpts(CONDS.map(function (c) { return [c, W.cond[c][0]]; }), s.cond || '') + '</select>' +
+    '<div class="acts" role="group" aria-label="Сонголт">' +
+    '<button type="button" class="btn" data-lid="' + x.id + '" data-act="like" aria-pressed="' + (s.st === 'like') + '">♥ Таалагдсан</button>' +
+    '<button type="button" class="btn" data-lid="' + x.id + '" data-act="dislike" aria-pressed="' + (s.st === 'dislike') + '">✖ Таалагдаагүй</button>' +
+    '<button type="button" class="btn alt" data-lid="' + x.id + '" data-act="' + (s.st === 'removed' ? 'restore' : 'remove') + '">' + (s.st === 'removed' ? 'Буцаах' : 'Жагсаалтаас хасах') + '</button></div>' +
+    '<button type="button" class="btn alt" data-lid="' + x.id + '" data-act="compare">Шалгагчид нэмэх</button>' +
+    '<label class="sm">Залгасан эсэх: ' + callName + (s.ts ? ' (' + s.ts + ')' : '') + '</label>' +
+    '<select data-lid="' + x.id + '" data-lf="call">' + selOpts(LW.calls, s.call || 'none') + '</select>' +
+    '<label class="sm" for="n' + x.id + '">Тэмдэглэл (утасны дугаар, ярьсан зүйл)</label><textarea id="n' + x.id + '" data-lid="' + x.id + '" data-lf="note">' + esc(s.note || '') + '</textarea></article>';
+}
+function renderList() {
+  var el = document.getElementById('lcards'); if (!el) return;
+  document.getElementById('tab-check').hidden = state.tab !== 'check';
+  document.getElementById('tab-list').hidden = state.tab !== 'list';
+  document.querySelectorAll('[data-tab]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.tab === state.tab)); });
+  if (state.tab !== 'list') return;
+  var f = state.LC.filter, rows = allItems().map(evalItem).filter(function (r) {
+    var fm = state.LC.floor;
+    if (fm === 'known' && !r.fc) return false;
+    if (fm === 'notfirst' && r.fc === 'first') return false;
+    if (fm === 'mid' && !(r.fc === 'mid' && r.ft > 0)) return false;
+    var s = state.L[r.x.id] || {}, st = s.st || '';
+    if (f === 'removed') return st === 'removed';
+    if (st === 'removed') return false;
+    if (f === 'like') return st === 'like';
+    if (f === 'dislike') return st === 'dislike';
+    if (f === 'called') return (s.call || 'none') !== 'none';
+    return true;
+  });
+  var key = state.LC.sort;
+  rows.sort(function (a, b) {
+    var da = (state.L[a.x.id] || {}).st === 'dislike' ? 1 : 0, db = (state.L[b.x.id] || {}).st === 'dislike' ? 1 : 0;
+    return (da - db) || ((key === 'price' ? a.x.p - b.x.p : key === 'total' ? a.total - b.total : key === 'perm2' ? a.perm2 - b.perm2 : a.gap - b.gap) || (a.x.id < b.x.id ? -1 : 1));
+  });
+  document.getElementById('lintro').textContent = allItems().length + ' зар (' + (state.custom || []).length + ' нь таны нэмсэн). Үнэ нь зарласан үнэ. Байрны байдал, давхрыг зарын гарчигнаас мэдэх боломжгүй тул та зарыг нээж харсныхаа дагуу өөрөө бичнэ.';
+  var ar = {};
+  allItems().forEach(function (x) { if ((state.L[x.id] || {}).st === 'removed') return; var k = (x.src === 'fb' ? x.s : x.l) || 'Тодорхойгүй'; (ar[k] = ar[k] || []).push(x.p / x.a); });
+  document.getElementById('lareas').innerHTML = '<p class="small">Нэг м²-ийн үнийн дундаж нь зарласан үнээр бодсон. Холбоос нь Google Maps-ийг шинэ цонхонд нээнэ.</p><dl class="list">' +
+    Object.keys(ar).sort(function (a, b) { return ar[b].length - ar[a].length || (a < b ? -1 : 1); }).map(function (k) {
+      return '<dt><a href="' + mapUrl(areaQuery(k === 'Тодорхойгүй' ? '' : k)) + '" target="_blank" rel="noopener">' + esc(k) + ' ↗</a></dt><dd>' + ar[k].length + ' зар, ' + M(Core.quantile(ar[k].slice().sort(function (a, b) { return a - b; }), 0.5), 2) + '/м²</dd>';
+    }).join('') + '</dl>';
+  document.getElementById('lcount').textContent = rows.length + ' зар харагдаж байна.';
+  el.innerHTML = rows.length ? rows.map(listCard).join('') : '<p class="card">Энэ сонголтоор зар алга.</p>';
+}
+function initList() {
+  document.getElementById('lintro').textContent = ITEMS.length + ' зар. Үнэ нь зарласан үнэ. Байрны байдлыг зарнаас мэдэх боломжгүй тул та өөрөө сонгоно.';
+  document.getElementById('lcond').innerHTML = selOpts(CONDS.map(function (c) { return [c, W.cond[c][0]]; }), state.LC.cond);
+  document.getElementById('lfin').innerHTML = selOpts(FINISH.map(function (c) { return [c, W.finish[c][0]]; }), state.LC.finish);
+  document.getElementById('lfilter').innerHTML = selOpts(LW.filters, state.LC.filter);
+  document.getElementById('lsort').innerHTML = selOpts(LW.sorts, state.LC.sort);
+  document.getElementById('lfloor').innerHTML = selOpts(LW.floors, state.LC.floor);
+}
+document.addEventListener('error', function (e) { var im = e.target; if (im && im.className === 'ph') im.style.display = 'none'; }, true);
+document.addEventListener('click', function (e) {
+  var im = e.target; if (im && im.dataset && im.dataset.zoom) {
+    var z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img alt="" referrerpolicy="no-referrer" src="' + esc(im.src) + '">';
+    z.addEventListener('click', function () { z.remove(); }); document.body.appendChild(z);
+  }
+});
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.tab) { state.tab = b.dataset.tab; renderList(); save(); return; }
+  if (b.dataset.pm) {
+    var oo = state.opts[+b.dataset.i], to = b.dataset.pm, ar = +oo.area || 0;
+    if (to === 'perm2' && oo.pmode !== 'perm2') oo.pm2 = (ar > 0 && oo.priceM > 0) ? Math.round(oo.priceM / ar * 100) / 100 : 0;
+    if (to === 'total' && oo.pmode === 'perm2') oo.priceM = (ar > 0 && oo.pm2 > 0) ? Math.round(oo.pm2 * ar * 10) / 10 : 0;
+    oo.pmode = to; touched(); renderCards(); return;
+  }
+  if (b.dataset.golist) { state.tab = 'list'; renderList(); save(); return; }
+  if (b.dataset.save != null) {
+    var o = state.opts[+b.dataset.save], q = optQuery(o);
+    if (!(q.area >= 15 && q.area <= 120 && q.price > 0)) return;
+    var nid = 'c' + Date.now(), rn = state.custom.length + 1;
+    state.custom.push({ id: nid, src: 'fb', t: (o.title || '').trim() || ('Өөрөө нэмсэн зар №' + rn + ' (' + q.rooms + ' өрөө, ' + q.area + ' м²)'), u: (o.link || '').trim(), l: o.sub || '', s: o.sub || '', r: q.rooms, a: q.area, p: q.price, f: o.finish, fl: q.fl, ft: q.ft, h: q.old ? 1 : 0, w: 'Өөрөө нэмсэн' });
+    state.L[nid] = { st: 'like', call: 'none', note: '', cond: o.cond, ts: '' }; stamp(state.L[nid]);
+    o.savedId = nid; o.savedSig = sigOf(o, q); state.example = false; refresh(); return;
+  }
+  var id = b.dataset.lid, act = b.dataset.act; if (!id || !act) return;
+  var s = lst(id);
+  if (act === 'like' || act === 'dislike') { s.st = s.st === act ? '' : act; }
+  else if (act === 'remove') s.st = 'removed';
+  else if (act === 'restore') s.st = '';
+  else if (act === 'compare') {
+    var x = allItems().filter(function (i) { return i.id === id; })[0], o = blank();
+    o.rooms = x.r; o.area = x.a; o.priceM = x.p / 1e6; o.pmode = 'total'; o.old = (r_old(x) ? '1' : '0'); o.fl = floorOf(x).fl; o.ft = floorOf(x).ft; o.sub = x.src === 'fb' ? (x.s || '') : x.l; o.title = x.src === 'fb' ? x.t : ''; o.link = x.src === 'fb' ? (x.u || '') : ''; o.cond = s.cond || state.LC.cond; o.finish = state.LC.finish;
+    if (state.example) state.opts = [];
+    state.example = false; if (state.opts.length >= 4) state.opts.shift(); state.opts.push(o); state.tab = 'check'; renderCards(); return;
+  }
+  stamp(s); refresh();
+});
+document.addEventListener('change', function (e) {
+  var t0 = e.target;
+  if (t0.id === 'lcond' || t0.id === 'lfin' || t0.id === 'lfilter' || t0.id === 'lsort' || t0.id === 'lfloor') {
+    var k = { lcond: 'cond', lfin: 'finish', lfilter: 'filter', lsort: 'sort', lfloor: 'floor' }[t0.id]; state.LC[k] = t0.value; refresh(); return;
+  }
+  if (t0.dataset.lid && t0.dataset.lf) { var s = lst(t0.dataset.lid); s[t0.dataset.lf] = t0.value; if (t0.dataset.lf === 'call') stamp(s); refresh(); }
+});
+document.addEventListener('input', function (e) {
+  var t0 = e.target;
+  if (t0.dataset.lid && t0.dataset.lf === 'note') { lst(t0.dataset.lid).note = t0.value; save(); }
+});
+
+var SUBS = (function () {
+  var c = {}; LIST.forEach(function (x) { c[x.s] = (c[x.s] || 0) + 1; });
+  return Object.keys(c).filter(function (k) { return c[k] >= 3; }).sort(function (a, b) { return c[b] - c[a] || (a < b ? -1 : 1); });
+})();
+
+function floorClass(fl, ft) { fl = +fl || 0; ft = +ft || 0; if (!fl) return ''; if (fl === 1) return 'first'; if (ft && fl >= ft) return 'top'; return 'mid'; }
+function r_old(x) { var s = state.L[x.id] || {}; return s.old === '1' ? true : s.old === '0' ? false : !!x.h; }
+function floorOf(x) { var s = state.L[x.id] || {}; return { fl: +s.fl || +x.fl || 0, ft: +s.ft || +x.ft || 0 }; }
+function floorText(fl, ft) { return fl ? fl + (ft ? ' / ' + ft : '') + '-р давхар' : 'Мэдэгдэхгүй'; }
+function clone(x) { return JSON.parse(JSON.stringify(x)); }
+function blank() { return { rooms: 1, area: 0, priceM: 0, sub: '', cond: 'old', finish: 'standard', title: '', link: '', fl: 0, ft: 0, old: '0' }; }
+function sample() { var a = blank(); a.area = 40; a.priceM = 149; a.sub = 'Модны 2'; return a; }
+function load() { try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.opts) && s.opts.length) return s; } catch (e) {} return null; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+var state = load() || { opts: [sample()], A: clone(Core.DEFAULTS), budget: 0, example: true, size: 'normal' };
+state.L = state.L || {}; state.custom = state.custom || []; state.LC = Object.assign({ cond: 'old', finish: 'standard', filter: 'all', sort: 'gap', floor: 'all' }, state.LC || {}); state.tab = state.tab || 'list';
+state.A = Object.assign(clone(Core.DEFAULTS), state.A || {});
+['factor', 'reno', 'finish', 'floor'].forEach(function (k) { state.A[k] = Object.assign(clone(Core.DEFAULTS[k]), state.A[k] || {}); });
+
+function M(n, d) { d = d == null ? 0 : d; return (n / 1e6).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' сая ₮'; }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function letter(i) { return String.fromCharCode(65 + i); }
+function choices(i, f, items, cur) {
+  return '<div class="choices">' + items.map(function (it) {
+    var on = String(cur) === String(it[0]);
+    return '<button type="button" class="choice" data-i="' + i + '" data-f="' + f + '" data-v="' + it[0] + '" aria-pressed="' + on + '"><span class="tick" aria-hidden="true">' + (on ? '✔' : '') + '</span><span><b>' + it[1] + '</b><small>' + it[2] + '</small></span></button>';
+  }).join('') + '</div>';
+}
+
+function cardHTML(o, i) {
+  var pm2 = o.pmode === 'perm2';
+  var subOpts = '<option value="">' + W.subAny + '</option>' + SUBS.map(function (s) { return '<option value="' + esc(s) + '"' + (o.sub === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('');
+  var many = state.opts.length > 1;
+  return '<article class="card" data-card="' + i + '">' +
+    (many ? '<div class="cardtop"><h2>' + W.option + ' ' + letter(i) + '</h2><button type="button" class="remove" data-remove="' + i + '">' + W.remove + '</button></div>' : '') +
+    '<fieldset class="step"><legend><span class="n">1</span>' + W.q1 + '</legend><div class="row2">' +
+    [1, 2].map(function (r) { return '<button type="button" class="big" data-i="' + i + '" data-f="rooms" data-v="' + r + '" aria-pressed="' + (o.rooms === r) + '">' + (r === 1 ? W.room1 : W.room2) + '</button>'; }).join('') + '</div></fieldset>' +
+    '<div class="step"><label class="q" for="area' + i + '"><span class="n">2</span>' + W.q2 + '</label><div class="field"><input type="number" id="area' + i + '" data-i="' + i + '" data-f="area" min="15" max="120" step="0.5" inputmode="decimal" value="' + (o.area || '') + '"><span class="unit">' + W.unitM2 + '</span></div><label class="small" for="old' + i + '">Хуучин барилга уу? (зарын гарчигт «хуучин» гэж бичсэн бол «Тийм»)</label><select id="old' + i + '" data-i="' + i + '" data-f="old"><option value="0"' + (o.old === '1' ? '' : ' selected') + '>Үгүй</option><option value="1"' + (o.old === '1' ? ' selected' : '') + '>Тийм: талбайд ' + state.A.oldExtra + ' м² нэмж бодно</option></select></div>' +
+    '<div class="step"><label class="q" for="price' + i + '"><span class="n">3</span>' + (pm2 ? W.q3b : W.q3) + '</label><div class="row2"><button type="button" class="big" data-pm="total" data-i="' + i + '" aria-pressed="' + !pm2 + '">Нийт үнэ</button><button type="button" class="big" data-pm="perm2" data-i="' + i + '" aria-pressed="' + pm2 + '">Нэг м² үнэ</button></div><div class="field"><input type="number" id="price' + i + '" data-i="' + i + '" data-f="' + (pm2 ? 'pm2' : 'priceM') + '" min="0" step="' + (pm2 ? '0.01' : '1') + '" inputmode="decimal" value="' + ((pm2 ? o.pm2 : o.priceM) || '') + '"><span class="unit">' + (pm2 ? W.unitPm2 : W.unitPrice) + '</span></div><span class="small" id="calc' + i + '"></span><span class="small">' + (pm2 ? W.priceHintB : W.priceHint) + '</span></div>' +
+    '<div class="step"><label class="q" for="sub' + i + '"><span class="n">4</span>' + W.q4 + '</label><select id="sub' + i + '" data-i="' + i + '" data-f="sub">' + subOpts + '</select></div>' +
+    '<div class="step"><div class="q"><span class="n">5</span>Хэддүгээр давхарт вэ? (заавал биш)</div><div class="row2"><label class="step" for="fl' + i + '"><span class="small">Таны байр хэддүгээр давхарт</span><input type="number" id="fl' + i + '" data-i="' + i + '" data-f="fl" min="1" max="40" step="1" inputmode="numeric" value="' + (o.fl || '') + '"></label><label class="step" for="ft' + i + '"><span class="small">Барилга нийт хэдэн давхартай</span><input type="number" id="ft' + i + '" data-i="' + i + '" data-f="ft" min="1" max="40" step="1" inputmode="numeric" value="' + (o.ft || '') + '"></label></div><span class="small">1-р болон хамгийн дээд давхар ихэвчлэн хямд зарагддаг. Мэдэхгүй бол хоосон орхино уу.</span></div>' +
+    '<fieldset class="step"><legend><span class="n">6</span>' + W.q5 + '</legend>' + choices(i, 'cond', CONDS.map(function (c) { return [c, W.cond[c][0], W.cond[c][1]]; }), o.cond) + '</fieldset>' +
+    '<fieldset class="step fin"><legend><span class="n">7</span>' + W.q6 + '</legend>' + choices(i, 'finish', FINISH.map(function (c) { return [c, W.finish[c][0], W.finish[c][1]]; }), o.finish) + '</fieldset>' +
+    '<div class="step"><label class="q" for="ttl' + i + '"><span class="n">8</span>Зарын нэр (заавал биш)</label><input class="text" type="text" id="ttl' + i + '" data-i="' + i + '" data-f="title" value="' + esc(o.title || '') + '" placeholder="Жишээ нь: Facebook дээрх зар, 3-4 хороолол"><label class="small" for="lnk' + i + '">Зарын холбоос эсвэл утасны дугаар (заавал биш)</label><input class="text" type="text" id="lnk' + i + '" data-i="' + i + '" data-f="link" value="' + esc(o.link || '') + '" placeholder="https://facebook.com/... эсвэл 99112233"></div>' +
+    '<div class="result" id="res' + i + '" aria-live="polite"></div></article>';
+}
+
+function optQuery(o) { return { rooms: +o.rooms, area: +o.area, sub: o.sub || '', cond: o.cond, finish: o.finish, old: o.old === '1', fl: +o.fl || 0, ft: +o.ft || 0, floor: floorClass(o.fl, o.ft), price: Math.round((o.pmode === 'perm2' ? (+o.pm2 || 0) * (+o.area || 0) : (+o.priceM || 0)) * 1e6) }; }
+function vkey(v) { return v.code === 'fair' ? 'fair_' + v.pos : v.code; }
+function box(l, v) { return '<div class="box"><span class="lab">' + l + '</span><span class="val">' + v + '</span></div>'; }
+function dl(rows) { return '<dl class="list">' + rows.map(function (r) { return '<dt' + (r[2] ? ' class="tot"' : '') + '>' + r[0] + '</dt><dd' + (r[2] ? ' class="tot"' : '') + '>' + r[1] + '</dd>'; }).join('') + '</dl>'; }
+function banner(cls, ic, title, text) { return '<div class="banner ' + cls + '" role="status"><span class="ic" aria-hidden="true"><span>' + ic + '</span></span><div><h3>' + title + '</h3><p>' + text + '</p></div></div>'; }
+
+function sigOf(o, q) { return JSON.stringify([q.rooms, q.area, q.price, q.sub, q.cond, q.finish, q.fl, q.ft, q.old, o.title || '', o.link || '']); }
+function saveHTML(o, q, i) {
+  if (!(q.price > 0)) return '<p class="small">Зарын үнийг бичвэл энэ байрыг жагсаалтад хадгалах боломжтой.</p>';
+  if (o.savedId && o.savedSig === sigOf(o, q) && allItems().some(function (x) { return x.id === o.savedId; }))
+    return '<div class="notice"><p><b>✔ Хадгалагдлаа.</b> «Бүх зар» хуудсанд таалагдсан гэж тэмдэглэгдсэн байна.</p><button type="button" class="btn" data-golist="1">Бүх зар руу очих</button></div>';
+  return '<button type="button" class="btn" data-save="' + i + '">♥ Жагсаалтад хадгалах</button>';
+}
+function resultHTML(o, ev, q, idx) {
+  var fr = ev.fair, c = ev.cost, a = state.A, h = '', cm = fr.comps;
+  if (ev.verdict) {
+    var V = W.verdict[vkey(ev.verdict)];
+    h += banner(V[2], V[1], V[0], V[3]);
+    h += '<div class="pair">' + box(W.fairLab, M(fr.low) + ' - ' + M(fr.high)) + box(W.yourLab, M(q.price)) + '</div>';
+  } else {
+    h += banner('info', '=', W.estTitle, W.estText);
+    h += '<div class="pair">' + box(W.fairLab, M(fr.low) + ' - ' + M(fr.high)) + box(W.fairMidLab, M(fr.mid)) + '</div>';
+  }
+  h += '<div class="warnbox"><b>Анхаар:</b> энэ нь зөвхөн зарласан үнийн харьцуулалт. Байрны орчин, аюулгүй байдал, барилгын чанар, хөрш, өмчлөлийн бичиг, зээлийн барьцааг тооцоогүй. Заавал биечлэн үзэж шалгаарай.</div>';
+  h += saveHTML(o, q, idx);
+  if (cm.noteCode === 'sub_fallback') h += '<div class="warnbox">' + esc(W.noteSub(cm.noteSub)) + '</div>';
+  else if (cm.noteCode === 'room_fallback') h += '<div class="warnbox">' + esc(W.noteRoom(q.rooms)) + '</div>';
+  if (q.old) h += '<p class="small">Хуучин барилга тул талбайг ' + a.oldExtra + ' м²-ээр нэмж (' + fr.qa + ' м²) бодсон.</p>';
+  if (q.floor && (a.floor[q.floor] || 1) !== 1) h += '<p class="small">' + (q.floor === 'first' ? '1-р давхар' : 'Хамгийн дээд давхар') + ' тул үнийн хүрээг ' + Math.round((1 - a.floor[q.floor]) * 100) + '% бууруулсан (таамаглал, нарийвчилсан тохиргооноос өөрчилнө).</p>';
+  if (ev.offer) {
+    h += '<div class="sec"><h2>' + W.offerH + '</h2>' + (q.price <= fr.low
+      ? '<p>' + W.offerNoteLow + '</p>'
+      : dl([[W.openAt, M(ev.offer.low)], [W.settle, M(ev.offer.high)], [W.walk, M(ev.offer.walkAway)]]) + '<p class="small">' + W.offerNote + '</p>') + '</div>';
+  } else {
+    h += '<div class="sec"><h2>' + W.offerH + '</h2>' + dl([[W.openAt, M(fr.low)], [W.settle, M(fr.mid)], [W.walk, M(fr.high)]]) + '</div>';
+  }
+  var rows = [[W.buy, M(c.price)], [W.fees(a.feesPct), M(c.fees)], [W.reno(a.contingencyPct), M(c.reno)]];
+  if (c.furnishing) rows.push([W.furn, M(c.furnishing)]);
+  h += '<div class="sec"><h2>' + W.costH + '</h2><p class="total">' + M(c.total) + '</p>' + dl(rows) + '<p class="small">' + W.perM2 + ': ' + M(c.perM2, 2) + '</p></div>';
+  var rd = ev.ready, diff = c.total - rd.mid, close = Math.abs(diff) < 0.03 * rd.mid;
+  var tail = (o.cond === 'new' || o.cond === 'fixed') ? 'plain' : close ? 'close' : diff > 0 ? 'worse' : 'better';
+  h += '<p>' + W.ready(M(rd.low), M(rd.high), M(Math.abs(diff)), diff > 0, tail) + '</p>';
+  if (state.budget > 0) {
+    var mp = Core.maxPrice(state.budget * 1e6, q, a);
+    h += '<p>' + W.budgetLine(state.budget, M(mp), ev.verdict ? (q.price <= mp ? W.fits : W.over(M(q.price - mp))) : '.') + '</p>';
+  }
+  h += '<p><b>' + W.confLabel + ' ' + W.conf[fr.conf.code] + '.</b> ' + W.confText(fr.conf.code, fr.conf.n) + '</p>';
+  h += '<details><summary>' + W.howH + '</summary><div class="in"><p>' +
+    (cm.sizeMatched ? W.how1(fr.stats.n, q.rooms, Math.round(cm.window * 100), q.area) : W.how1b(fr.stats.n, q.rooms)) + '</p><p>' +
+    W.how2(M(fr.stats.p25, 2), M(fr.stats.median, 2), M(fr.stats.p75, 2)) + '</p><p>' + W.how3(fr.factor.toFixed(2)) + '</p></div></details>';
+  return h;
+}
+
+function refresh() {
+  var rows = [];
+  document.getElementById('example').hidden = !state.example;
+  document.documentElement.setAttribute('data-size', state.size);
+  document.querySelectorAll('[data-size]').forEach(function (b) { if (b.tagName === 'BUTTON') b.setAttribute('aria-pressed', String(b.dataset.size === state.size)); });
+  state.opts.forEach(function (o, i) {
+    var q = optQuery(o), el = document.getElementById('res' + i);
+    var cl = document.getElementById('calc' + i); if (cl) cl.textContent = (o.pmode === 'perm2' && q.price > 0) ? 'Нийт үнэ: ' + M(q.price, 1) : '';
+    document.querySelectorAll('[data-card="' + i + '"] button[data-f]').forEach(function (b) {
+      var on = String(state.opts[b.dataset.i][b.dataset.f]) === b.dataset.v; b.setAttribute('aria-pressed', on);
+      var tk = b.querySelector('.tick'); if (tk) tk.textContent = on ? '✔' : '';
+    });
+    var fin = document.querySelector('[data-card="' + i + '"] .fin'); if (fin) fin.hidden = o.cond === 'new';
+    if (!(q.area >= 15 && q.area <= 120)) { el.innerHTML = '<p>' + W.needArea + '</p>'; return; }
+    var ev = Core.evaluate(LIST, q, state.A); el.innerHTML = resultHTML(o, ev, q, i); rows.push({ o: o, i: i, q: q, ev: ev });
+  });
+  var cmp = document.getElementById('compare'); cmp.hidden = rows.length < 2;
+  if (rows.length >= 2) {
+    var best = rows.reduce(function (m, r) { return r.ev.cost.perM2 < m.ev.cost.perM2 ? r : m; });
+    document.getElementById('cmp').innerHTML = rows.map(function (r) {
+      var V = r.ev.verdict ? W.verdict[vkey(r.ev.verdict)][0] : W.cmpNoPrice;
+      return '<div class="it' + (r === best ? ' best' : '') + '"><b>' + W.option + ' ' + letter(r.i) + '</b>: ' + r.q.rooms + ' өрөө, ' + r.q.area + ' м²' + (r.q.fl ? ', ' + floorText(r.q.fl, r.q.ft) : '') + '<br>' + V + '<br>' + W.cmpTotal + ': <b>' + M(r.ev.cost.total) + '</b>' + (r === best ? '<br><b>✔ ' + W.cmpBest + '</b>' : '') + '</div>';
+    }).join('');
+  }
+  document.getElementById('add').disabled = state.opts.length >= 4;
+  renderList();
+  save();
+}
+
+function renderCards() { document.getElementById('cards').innerHTML = state.opts.map(cardHTML).join(''); refresh(); }
+
+function assumptionsHTML() {
+  var a = state.A;
+  var num = function (id, label, val, step) { return '<label class="step" for="' + id + '"><span class="q" style="font-size:.95rem">' + label + '</span><input class="text" type="number" id="' + id + '" data-a="' + id + '" step="' + step + '" value="' + val + '"></label>'; };
+  return '<div class="sec"><h2>' + W.aF + '</h2>' + CONDS.map(function (c) { return num('factor_' + c, W.cond[c][0], Math.round((a.factor[c] - 1) * 100), 1); }).join('') + '</div>' +
+    '<div class="sec"><h2>' + W.aR + '</h2>' + CONDS.map(function (c) { return num('reno_' + c, W.cond[c][0], Math.round(a.reno[c] / 1000), 10); }).join('') + '</div>' +
+    '<div class="sec"><h2>' + W.aFin + '</h2>' + FINISH.map(function (c) { return num('finish_' + c, W.finish[c][0], a.finish[c], 0.05); }).join('') + '</div>' +
+    '<div class="sec"><h2>Давхрын нөлөө (үнийн хүрээнд, %)</h2>' + num('floor_first', '1-р давхар', Math.round((a.floor.first - 1) * 100), 1) + num('floor_top', 'Хамгийн дээд давхар', Math.round((a.floor.top - 1) * 100), 1) + '</div>' +
+    '<div class="sec"><h2>' + W.aO + '</h2>' + num('oldExtra', 'Хуучин барилгын нэмэлт талбай, м²', a.oldExtra, 1) + num('feesPct', W.feesPct, a.feesPct, 0.5) + num('contingencyPct', W.contPct, a.contingencyPct, 1) + num('furnishing', W.furnLbl, a.furnishing / 1e6, 1) + '</div>';
+}
+
+function init() {
+  var n1 = LIST.filter(function (x) { return x.r === 1; }).length;
+  document.getElementById('about').textContent = W.about(LIST.length, n1, LIST.length - n1, DATA.asOf);
+  document.getElementById('assump').innerHTML = assumptionsHTML();
+  document.getElementById('budget').value = state.budget || '';
+  initList();
+  renderCards();
+}
+
+function touched() { state.example = false; }
+document.addEventListener('input', function (e) {
+  var t0 = e.target, i = t0.dataset.i, f = t0.dataset.f;
+  if (t0.id === 'budget') { state.budget = parseFloat(t0.value) || 0; refresh(); return; }
+  if (i != null && f) { touched(); state.opts[i][f] = (f === 'sub' || f === 'title' || f === 'link') ? t0.value : (parseFloat(t0.value) || 0); refresh(); return; }
+  if (t0.dataset.a) {
+    var k = t0.dataset.a, v2 = parseFloat(t0.value), a = state.A; if (isNaN(v2)) v2 = 0;
+    if (k.indexOf('floor_') === 0) a.floor[k.slice(6)] = 1 + v2 / 100;
+    else if (k.indexOf('factor_') === 0) a.factor[k.slice(7)] = 1 + v2 / 100;
+    else if (k.indexOf('reno_') === 0) a.reno[k.slice(5)] = v2 * 1000;
+    else if (k.indexOf('finish_') === 0) a.finish[k.slice(7)] = v2;
+    else if (k === 'furnishing') a.furnishing = v2 * 1e6;
+    else a[k] = v2;
+    refresh();
+  }
+});
+document.addEventListener('change', function (e) { var t0 = e.target; if (t0.tagName === 'SELECT' && t0.dataset.i != null) { touched(); state.opts[t0.dataset.i][t0.dataset.f] = t0.value; refresh(); } });
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.size) { state.size = b.dataset.size; refresh(); }
+  else if (b.dataset.f && b.dataset.i != null) { touched(); var v = b.dataset.v; state.opts[b.dataset.i][b.dataset.f] = (b.dataset.f === 'rooms') ? +v : v; refresh(); }
+  else if (b.dataset.remove != null) { state.opts.splice(+b.dataset.remove, 1); renderCards(); }
+  else if (b.id === 'add') { touched(); state.opts.push(blank()); renderCards(); }
+  else if (b.id === 'clear') { state.opts = [blank()]; state.example = false; renderCards(); }
+  else if (b.id === 'reset') { state.A = clone(Core.DEFAULTS); document.getElementById('assump').innerHTML = assumptionsHTML(); refresh(); }
+});
+init();
+}
+</script>
+<script>
+/* Gate: password (decrypts the master list) -> pick a nickname -> boot the app.
+   Profiles live in this browser's localStorage only. */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var PK = 'bpc.profiles', SK = 'bpc.sess', NK = 'bpc.nick';
+  var enc = null;
+  function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} return null; }
+  function profiles() { try { var p = JSON.parse(localStorage.getItem(PK)); if (Array.isArray(p)) return p; } catch (e) {} return []; }
+  function saveProfiles(p) { try { localStorage.setItem(PK, JSON.stringify(p)); } catch (e) {} }
+  function b64(s) { return Uint8Array.from(atob(s), function (c) { return c.charCodeAt(0); }); }
+  function b64s(buf) { var a = new Uint8Array(buf), s = ''; for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pkey(n) { return 'bpc.v3.p.' + encodeURIComponent(n.toLowerCase()); }
+
+  async function loadEnc() {
+    if (enc) return enc;
+    var r = await fetch('data.enc.json?v=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('data');
+    enc = await r.json(); return enc;
+  }
+  async function decrypt(key) {
+    var e = await loadEnc();
+    var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(e.iv) }, key, b64(e.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+  async function deriveKey(pw) {
+    var e = await loadEnc();
+    var km = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(e.salt), iterations: e.iter, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+  }
+
+  var master = null;
+  function showProfiles() {
+    $('g-pw').hidden = true; $('g-prof').hidden = false;
+    var ps = profiles(), cols = ['#0b3d91', '#0b5a35', '#8a1a12', '#6e3f00', '#5b2a86', '#006b75'];
+    $('plist').innerHTML = ps.map(function (n, i) {
+      return '<div style="display:flex;flex-direction:column;gap:4px;align-items:center"><button type="button" class="prof" data-gp="' + i + '"><span class="av" style="background:' + cols[i % cols.length] + '" aria-hidden="true">' + esc(Array.from(n)[0].toUpperCase()) + '</span><span class="nm">' + esc(n) + '</span></button><button type="button" class="linkbtn small" data-gd="' + i + '">Устгах</button></div>';
+    }).join('');
+    $('pnew-wrap').querySelector('label').textContent = ps.length ? 'Шинэ хоч нэмэх' : 'Хочоо сонгоно уу';
+  }
+  function enter(name) {
+    ss(NK, name);
+    window.__MASTER = master; window.__KEY = pkey(name);
+    $('gate').hidden = true; document.querySelector('main').hidden = false;
+    $('who').textContent = 'Хоч: ' + name;
+    boot();
+  }
+  async function unlock(pw, fromSession) {
+    try {
+      var key = fromSession || await deriveKey(pw);
+      master = await decrypt(key);
+      ss(SK, b64s(await crypto.subtle.exportKey('raw', key)));
+      return true;
+    } catch (e) { return false; }
+  }
+
+  $('pw-go').addEventListener('click', async function () {
+    var pw = $('pw').value; if (!pw) return;
+    $('pw-err').textContent = ''; $('pw-go').disabled = true;
+    try {
+      if (!crypto || !crypto.subtle) { $('pw-err').textContent = 'Аюулгүй (https) холболт шаардлагатай.'; return; }
+      if (await unlock(pw)) { $('pw').value = ''; showProfiles(); }
+      else $('pw-err').textContent = 'Нууц үг буруу байна.';
+    } catch (e) { $('pw-err').textContent = 'Өгөгдөл ачаалж чадсангүй. Дахин оролдоно уу.'; }
+    $('pw-go').disabled = false;
+  });
+  $('pw-eye').addEventListener('click', function () {
+    var show = $('pw').type === 'password'; $('pw').type = show ? 'text' : 'password';
+    this.setAttribute('aria-pressed', show); this.setAttribute('aria-label', show ? 'Нууц үгийг нуух' : 'Нууц үгийг харуулах');
+    $('eye-slash').hidden = !show; $('pw').focus();
+  });
+  $('pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pw-go').click(); });
+
+  function addProfile() {
+    var n = $('pnew').value.trim().replace(/\s+/g, ' '), ps = profiles();
+    if (!n) { $('pnew-err').textContent = 'Хоч бичнэ үү.'; return; }
+    if (ps.some(function (p) { return p.toLowerCase() === n.toLowerCase(); })) { $('pnew-err').textContent = 'Энэ хоч аль хэдийн байна. Жагсаалтаас сонгоно уу.'; return; }
+    ps.push(n); saveProfiles(ps); $('pnew').value = ''; $('pnew-err').textContent = ''; enter(n);
+  }
+  $('pnew-go').addEventListener('click', addProfile);
+  $('pnew').addEventListener('keydown', function (e) { if (e.key === 'Enter') addProfile(); });
+  $('g-prof').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.gp != null) enter(profiles()[+b.dataset.gp]);
+    else if (b.dataset.gd != null) {
+      var ps = profiles(), n = ps[+b.dataset.gd];
+      if (!confirm('"' + n + '" хочийг болон түүний жагсаалтыг устгах уу?')) return;
+      try { localStorage.removeItem(pkey(n)); } catch (er) {}
+      ps.splice(+b.dataset.gd, 1); saveProfiles(ps); showProfiles();
+    }
+  });
+  function lock() { ss(SK, null); ss(NK, null); location.reload(); }
+  $('g-lock').addEventListener('click', lock);
+  $('p-lock').addEventListener('click', lock);
+  $('p-switch').addEventListener('click', function () { ss(NK, null); location.reload(); });
+
+  /* Resume this tab's session after a refresh. */
+  (async function () {
+    var raw = ss(SK); if (!raw) return;
+    try {
+      var key = await crypto.subtle.importKey('raw', b64(raw), { name: 'AES-GCM' }, true, ['decrypt']);
+      if (!(await unlock(null, key))) { ss(SK, null); return; }
+      var nick = ss(NK);
+      if (nick && profiles().indexOf(nick) >= 0) enter(nick); else showProfiles();
+    } catch (e) { ss(SK, null); }
+  })();
+})();
+</script>
+</body>
+</html>
