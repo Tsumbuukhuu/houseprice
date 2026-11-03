@@ -103,6 +103,21 @@ details .in { display: flex; flex-direction: column; gap: 12px; padding-top: 10p
 .lc.like { border-color: var(--good); background: var(--good-bg); }
 .lc.dim { background: var(--bg); border-style: dashed; color: var(--ink-2); }
 .lc.dim h3 { text-decoration: line-through; }
+.lc { padding: 0; gap: 0; overflow: hidden; }
+.lc-sum { all: unset; box-sizing: border-box; display: flex; gap: 12px; align-items: center; width: 100%; padding: 10px 12px; cursor: pointer; min-height: 5rem; }
+.lc-sum:focus-visible { outline: 4px solid var(--accent); outline-offset: -4px; }
+.lc-th { flex: none; width: 4.6rem; height: 4.6rem; border-radius: 10px; object-fit: cover; background: var(--bg); border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--ink-2); }
+.lc-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lc-price { font-size: 1.15rem; font-weight: 800; line-height: 1.25; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.lc-price .pm { font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+.lc-line { font-size: .9rem; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-line.sub { font-size: .82rem; color: var(--ink-2); }
+.lc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.lc-tags .tag { font-size: .75rem; padding: 0 7px; }
+.lc-chev { flex: none; font-size: 1.1rem; font-weight: 700; transition: transform .15s; }
+.lc-sum[aria-expanded="true"] .lc-chev { transform: rotate(180deg); }
+.lc-body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 2px solid var(--line); }
+.lc-body[hidden] { display: none; }
 .phs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
 .ph { flex: none; width: 5.2rem; height: 3.9rem; object-fit: cover; border-radius: 8px; background: var(--bg); border: 2px solid var(--line); display: block; cursor: zoom-in; }
 .zoom { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.85); display: flex; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
@@ -247,7 +262,7 @@ details .in { display: flex; flex-direction: column; gap: 12px; padding-top: 10p
       <summary>Хороолол тус бүрээр, газрын зураг дээр харах</summary>
       <div class="in" id="lareas"></div>
     </details>
-    <section id="lcards" style="display:flex;flex-direction:column;gap:16px"></section>
+    <section id="lcards" style="display:flex;flex-direction:column;gap:10px"></section>
     <p class="small">Таны сонголт, тэмдэглэл зөвхөн энэ төхөөрөмж дээрх хөтөч дотор хадгалагдана. Өөр утас, компьютер дээр харагдахгүй.</p>
   </div>
 </main>
@@ -493,7 +508,17 @@ function listCard(r) {
   var x = r.x, s = state.L[x.id] || {}, v = r.ev.verdict, V = W.verdict[vkey(v)];
   var cls = s.st === 'like' ? ' like' : (s.st === 'dislike' ? ' dim' : '');
   var callName = (LW.calls.filter(function (c) { return c[0] === (s.call || 'none'); })[0] || LW.calls[0])[1];
-  return '<article class="lc' + cls + '">' + photosHTML(x) + '<h3>' + esc(x.t) + '</h3>' +
+  var open = !!(state.open && state.open[x.id]);
+  var short = { far_below: 'Маш бага', below: 'Бага', fair: 'Хүрээнд', above: 'Өндөр', far_above: 'Маш өндөр' }[v.code] || V[0];
+  var th = (x.imgs || []).concat(x.i ? [x.i] : []).filter(Boolean)[0];
+  var summary = '<button type="button" class="lc-sum" data-act="toggle" data-lid="' + x.id + '" aria-expanded="' + open + '" aria-controls="lb' + x.id + '">' +
+    (th ? '<img class="lc-th" src="' + esc(th) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '<span class="lc-th" aria-hidden="true">⌂</span>') +
+    '<span class="lc-mid"><span class="lc-price">' + M(x.p) + '<span class="pm">' + M(r.perm2, 2) + '/м²</span></span>' +
+    '<span class="lc-line">' + x.r + ' өрөө · ' + x.a + ' м² · ' + (r.fl ? r.fl + (r.ft ? '/' + r.ft : '') + '-р давхар' : 'давхар ?') + '</span>' +
+    '<span class="lc-line sub">' + esc(x.l || 'Тодорхойгүй') + '</span>' +
+    '<span class="lc-tags"><span class="tag ' + V[2] + '">' + V[1] + ' ' + short + '</span>' + (s.st === 'like' ? '<span class="tag good">♥</span>' : '') + (s.st === 'dislike' ? '<span class="tag">✖</span>' : '') + ((s.call || 'none') !== 'none' ? '<span class="tag info">☎ ' + callName + '</span>' : '') + '</span></span>' +
+    '<span class="lc-chev" aria-hidden="true">▾</span></button>';
+  return '<article class="lc' + cls + '">' + summary + '<div class="lc-body" id="lb' + x.id + '"' + (open ? '' : ' hidden') + '>' + photosHTML(x) + '<h3>' + esc(x.t) + '</h3>' +
     '<p><span class="tag ' + V[2] + '">' + V[1] + ' ' + V[0] + '</span>' + (s.st === 'like' ? ' <span class="tag good">♥ Таалагдсан</span>' : '') + (s.st === 'dislike' ? ' <span class="tag">✖ Таалагдаагүй</span>' : '') + '</p>' +
     '<dl class="list"><dt>Байршил</dt><dd>' + esc(x.l || 'Тодорхойгүй') + '</dd><dt>Хэмжээ</dt><dd>' + x.r + ' өрөө, ' + x.a + ' м²</dd><dt>Давхар</dt><dd>' + floorText(r.fl, r.ft) + '</dd><dt>Зарласан үнэ</dt><dd>' + M(x.p) + '</dd>' +
     '<dt>Нэг м²' + (r.old ? ' (' + r.qa + ' м²-ээр)' : '') + '</dt><dd>' + M(r.perm2, 2) + '</dd><dt>Ижил төстэй зарын үнэ</dt><dd>' + M(r.ev.fair.low) + ' - ' + M(r.ev.fair.high) + '</dd>' +
@@ -511,7 +536,7 @@ function listCard(r) {
     '<button type="button" class="btn alt" data-lid="' + x.id + '" data-act="compare">Шалгагчид нэмэх</button>' +
     '<label class="sm">Залгасан эсэх: ' + callName + (s.ts ? ' (' + s.ts + ')' : '') + '</label>' +
     '<select data-lid="' + x.id + '" data-lf="call">' + selOpts(LW.calls, s.call || 'none') + '</select>' +
-    '<label class="sm" for="n' + x.id + '">Тэмдэглэл (утасны дугаар, ярьсан зүйл)</label><textarea id="n' + x.id + '" data-lid="' + x.id + '" data-lf="note">' + esc(s.note || '') + '</textarea></article>';
+    '<label class="sm" for="n' + x.id + '">Тэмдэглэл (утасны дугаар, ярьсан зүйл)</label><textarea id="n' + x.id + '" data-lid="' + x.id + '" data-lf="note">' + esc(s.note || '') + '</textarea></div></article>';
 }
 function renderList() {
   var el = document.getElementById('lcards'); if (!el) return;
@@ -581,6 +606,10 @@ document.addEventListener('click', function (e) {
     o.savedId = nid; o.savedSig = sigOf(o, q); state.example = false; refresh(); return;
   }
   var id = b.dataset.lid, act = b.dataset.act; if (!id || !act) return;
+  if (act === 'toggle') {
+    state.open = state.open || {}; var on = !state.open[id]; if (on) state.open[id] = 1; else delete state.open[id];
+    b.setAttribute('aria-expanded', String(on)); var bd = document.getElementById('lb' + id); if (bd) bd.hidden = !on; return;
+  }
   var s = lst(id);
   if (act === 'like' || act === 'dislike') { s.st = s.st === act ? '' : act; }
   else if (act === 'remove') s.st = 'removed';
@@ -618,7 +647,7 @@ function clone(x) { return JSON.parse(JSON.stringify(x)); }
 function blank() { return { rooms: 1, area: 0, priceM: 0, sub: '', cond: 'old', finish: 'standard', title: '', link: '', fl: 0, ft: 0, old: '0' }; }
 function sample() { var a = blank(); a.area = 40; a.priceM = 149; a.sub = 'Модны 2'; return a; }
 function load() { try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.opts) && s.opts.length) return s; } catch (e) {} return null; }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state, function (k, v) { return k === 'open' ? undefined : v; })); } catch (e) {} }
 var state = load() || { opts: [sample()], A: clone(Core.DEFAULTS), budget: 0, example: true, size: 'normal' };
 state.L = state.L || {}; state.custom = state.custom || []; state.LC = Object.assign({ cond: 'old', finish: 'standard', filter: 'all', sort: 'gap', floor: 'all' }, state.LC || {}); state.tab = state.tab || 'list';
 state.A = Object.assign(clone(Core.DEFAULTS), state.A || {});
